@@ -101,8 +101,40 @@ SOFTWARE.
 			$provide.decorator('uibDatepickerDirective', ['$delegate', datepickerDelegate]);
 
 		// extending daypicker (access to day and datepicker scope through $parent)
-		var daypickerDelegate = function ($delegate) {
+		var daypickerDelegate = function ($delegate, $templateCache) {
 			var directive = $delegate[0];
+
+			$templateCache.put("uib/template/datepicker/multi-day.html",
+	        "<table class=\"uib-daypicker\" role=\"grid\" aria-labelledby=\"{{::uniqueId}}-title\" aria-activedescendant=\"{{activeDateId}}\">\n" +
+	        "  <thead>\n" +
+	        "    <tr>\n" +
+	        "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-left uib-left\" ng-click=\"move(-1)\" tabindex=\"-1\"><i class=\"glyphicon glyphicon-chevron-left\"></i></button></th>\n" +
+	        "      <th colspan=\"{{::5 + showWeeks}}\"><button id=\"{{::uniqueId}}-title\" role=\"heading\" aria-live=\"assertive\" aria-atomic=\"true\" type=\"button\" class=\"btn btn-default btn-sm uib-title\" ng-click=\"toggleMode()\" ng-disabled=\"datepickerMode === maxMode\" tabindex=\"-1\"><strong>{{title}}</strong></button></th>\n" +
+	        "      <th><button type=\"button\" class=\"btn btn-default btn-sm pull-right uib-right\" ng-click=\"move(1)\" tabindex=\"-1\"><i class=\"glyphicon glyphicon-chevron-right\"></i></button></th>\n" +
+	        "    </tr>\n" +
+	        "    <tr>\n" +
+	        "      <th ng-if=\"showWeeks\" class=\"text-center\"></th>\n" +
+	        "      <th ng-repeat=\"label in ::labels track by $index\" class=\"text-center\"><small aria-label=\"{{::label.full}}\">{{::label.abbr}}</small></th>\n" +
+	        "    </tr>\n" +
+	        "  </thead>\n" +
+	        "  <tbody>\n" +
+	        "    <tr class=\"uib-weeks\" ng-repeat=\"row in rows track by $index\">\n" +
+	        "      <td ng-if=\"showWeeks\" class=\"text-center h6\"><em>{{ weekNumbers[$index] }}</em></td>\n" +
+	        "      <td ng-repeat=\"dt in row\" class=\"uib-day text-center\" role=\"gridcell\"\n" +
+	        "        id=\"{{::dt.uid}}\"\n" +
+	        "        ng-class=\"::dt.customClass\">\n" +
+	        "        <button type=\"button\" class=\"btn btn-default btn-sm\"\n" +
+	        "            ng-class=\"{'btn-info': dt.selected, active: isActive(dt)}\"\n" +
+	        "          ng-click=\"select(dt.date)\"\n" +
+	        "          ng-disabled=\"::dt.disabled\"\n" +
+	        "          tabindex=\"-1\"><span ng-class=\"::{'text-muted': dt.secondary, 'text-info': dt.current}\">{{::dt.label}}</span></button>\n" +
+	        "      </td>\n" +
+	        "    </tr>\n" +
+	        "  </tbody>\n" +
+	        "</table>\n" +
+	        "");
+
+	        directive.templateUrl = "uib/template/datepicker/multi-day.html";
 
 			// Override compile
 			var link = directive.link;
@@ -141,9 +173,9 @@ SOFTWARE.
 		}
 
 		if ($injector.has('daypickerDirective'))
-			$provide.decorator('daypickerDirective', ['$delegate', daypickerDelegate]);
+			$provide.decorator('daypickerDirective', ['$delegate', '$templateCache', daypickerDelegate]);
 
 		if ($injector.has('uibDaypickerDirective'))
-			$provide.decorator('uibDaypickerDirective', ['$delegate', daypickerDelegate]);
+			$provide.decorator('uibDaypickerDirective', ['$delegate', '$templateCache', daypickerDelegate]);
 	}]);
 })(window.angular);
